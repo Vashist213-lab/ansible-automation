@@ -1,0 +1,10 @@
+---
+- name: Automation LAMP Stack
+  hosts: localhost
+  roles:
+    - role: prerequisites
+      tags: always
+    - role: configure_lamp
+      tags: always
+    - role: reverse_proxy
+      tags: always

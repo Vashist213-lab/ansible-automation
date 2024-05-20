@@ -1,0 +1,9 @@
+---
+# Add tasks to update and upgrade the system here
+# Add tasks to install packages such as python3 and nginx here
+# Use a defaults/main.yml file to define package versions if necessary
+# Use a handlers/main.yml file to enable and start nginx
+
+- name: Print message
+  ansible.builtin.debug:
+    msg: Please remove me

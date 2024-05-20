@@ -1,0 +1,24 @@
+---
+profile: production
+offline: false
+
+var_naming_pattern: '^[a-z_][a-z0-9_]*$'
+
+skip_list: []
+
+mock_modules: []
+
+enable_list:
+  - args
+  - empty-string-compare
+  - no-log-password
+  - no-same-owner
+  - yaml
+
+exclude_paths:
+  - .git/
+  - .venv/
+  - ansible_collections/
+  - .github/
+  - .trunk/
+  - .vscode/

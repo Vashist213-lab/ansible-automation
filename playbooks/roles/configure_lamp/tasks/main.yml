@@ -1,0 +1,7 @@
+---
+# Add tasks to automate the steps done during weeks 5 and 6 here
+# Use the files/ and templates/ directories too
+
+- name: Print message
+  ansible.builtin.debug:
+    msg: Please remove me

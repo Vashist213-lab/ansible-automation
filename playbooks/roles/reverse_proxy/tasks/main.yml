@@ -1,0 +1,9 @@
+---
+# Add tasks to generate and configure an SSL certificate and a private key here
+# Add tasks to configure nginx as a reverse proxy here
+# Add vhosts and other necessary files in the files/ and templates/ directories as appropriate
+# Use handlers to restart nginx if necessary
+
+- name: Print message
+  ansible.builtin.debug:
+    msg: Please remove me
