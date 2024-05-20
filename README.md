@@ -15,7 +15,7 @@ cd interns-ansible-automation/
 
 # Make sure you have python installed
 sudo apt update
-sudo apt install -y python3 python3-virtualenv python3.11-venv
+sudo apt install -y python3 python3-virtualenv python3.10-venv python3.11-venv
 
 # Create and setup the virtualenv
 python3 -m venv .venv
