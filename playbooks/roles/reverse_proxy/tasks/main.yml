@@ -1,9 +1,49 @@
 ---
-# Add tasks to generate and configure an SSL certificate and a private key here
-# Add tasks to configure nginx as a reverse proxy here
-# Add vhosts and other necessary files in the files/ and/or templates/ directories as appropriate
-# Use handlers to restart nginx if necessary
+# Task to create the directory for SSL certificate and key
+- name: Create Nginx folder for SSL and configuration
+  file:
+    path: "{{ nginx_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
 
-- name: Print message
-  ansible.builtin.debug:
-    msg: Please remove me
+# Task to generate the SSL private key
+- name: Generate SSL private key
+  openssl_privatekey:
+    path: "{{ ssl_key_file }}"
+    size: 2048
+    type: RSA
+
+# Task to generate the SSL certificate using supported parameters
+- name: Generate SSL certificate
+  openssl_certificate:
+    path: "{{ ssl_cert_file }}"
+    privatekey_path: "{{ ssl_key_file }}"git config --global user.email "your-email@example.com"
+
+    provider: selfsigned
+    selfsigned_not_before: "{{ lookup('pipe', 'date -u +%Y%m%d%H%M%SZ') }}"  # Current UTC time
+    selfsigned_not_after: "{{ lookup('pipe', 'date -u -d +365days +%Y%m%d%H%M%SZ') }}"  # Expires in 365 days
+    subject:
+      commonName: "localhost"
+      countryName: "US"
+      stateOrProvinceName: "State"
+      localityName: "City"
+      organizationName: "Company"
+      organizationalUnitName: "IT"
+
+# Task to copy Nginx vhost configuration from the template
+- name: Copy Nginx vhost configuration from template
+  template:
+    src: templates/nginx_reverse_proxy.conf.j2
+    dest: "{{ nginx_vhost_path }}"
+  notify:
+    - Restart Nginx
+
+# Link the configuration from the nginx folder to sites-enabled
+- name: Enable Nginx site by linking to sites-enabled
+  file:
+    src: "{{ nginx_vhost_path }}"
+    dest: "{{ nginx_vhost_link }}"
+    state: link
+  notify: Restart Nginx 

@@ -1,0 +1,21 @@
+# # defaults/main.yml (within the configure_lamp role)
+# env_variables:
+#   DB_SERVER: mysql
+#   DB_NAME: ansible_db  # Define the database name
+#   DB_USERNAME: ansible_user  # Define the database username
+#   DB_PASSWORD: "12345"  # Define the database user password
+#   DB_ROOT_PASSWORD: "1234"  # Define the root password for MySQL
+#   HOST_MACHINE_HTTP_PORT: "8080"  # Define the port for the webserver
+#   HOST_MACHINE_MYSQL_PORT: "3306"  # Define the port for MySQL
+#   HOST_MACHINE_PHPMYADMIN_PORT: "8081"  # Define the port for phpMyAdmin
+#   PHP_VERSION: "7.4"  # Define the PHP version
+env_variables:
+  DB_SERVER: mysql
+  DB_NAME: ansible_db
+  DB_USERNAME: ansible_user
+  DB_PASSWORD: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits') }}"
+  DB_ROOT_PASSWORD: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits') }}"
+  HOST_MACHINE_HTTP_PORT: "8080"
+  HOST_MACHINE_MYSQL_PORT: "3306"
+  HOST_MACHINE_PHPMYADMIN_PORT: "8081"
+  PHP_VERSION: "7.4"

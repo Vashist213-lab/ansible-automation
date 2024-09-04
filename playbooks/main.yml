@@ -1,6 +1,7 @@
 ---
 - name: Automation LAMP Stack
   hosts: localhost
+  # become: yes
   roles:
     - role: prerequisites
       tags: always
@@ -8,3 +9,5 @@
       tags: always
     - role: reverse_proxy
       tags: always
+
+ 

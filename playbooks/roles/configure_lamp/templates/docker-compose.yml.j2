@@ -1,0 +1,51 @@
+services:
+  webserver:
+    build: 
+      context: "./bin/webserver"
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    container_name: 'interns-webserver'
+    restart: 'always'
+    ports:
+      - "${HOST_MACHINE_HTTP_PORT}:80"
+    links:
+      - mysql
+    volumes: 
+      - ./webroot:/var/www/html
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini
+      - ./config/vhosts:/etc/apache2/sites-enabled
+      - ./logs/apache2:/var/log/apache2
+    environment:
+      DB_DATABASE: "${DB_NAME}"
+      DB_USER: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+
+  mysql:
+    image: '${DB_SERVER}'
+    container_name: 'interns-db'
+    restart: 'always'
+    ports:
+      - "${HOST_MACHINE_MYSQL_PORT}:3306"
+    volumes: 
+      - ./data/mysql:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: 'interns-phpmyadmin'
+    restart: 'always'
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - '${HOST_MACHINE_PHPMYADMIN_PORT}:80'

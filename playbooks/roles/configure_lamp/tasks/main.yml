@@ -1,7 +1,132 @@
 ---
-# Add tasks to automate the steps done during weeks 5 and 6 here
-# Use the defaults/ and files/ directories too
+# Playbook to configure a LAMP stack with Docker using Ansible
+# Add tasks to automate steps as per the requirements
 
-- name: Print message
-  ansible.builtin.debug:
-    msg: Please remove me
+# Ensure Docker is installed
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  become: true
+
+# Ensure Docker Compose is installed
+- name: Install Docker Compose
+  apt:
+    name: docker-compose
+    state: present
+    update_cache: yes
+  become: true
+
+# Define the path for cloning the LAMP repository
+- name: Define LAMP clone path
+  set_fact:
+    lamp_clone_path: "/home/vashist0213/automated-docker-compose-lamp"
+
+# Check if the LAMP repository is already cloned
+- name: Check if the LAMP repository is already cloned
+  stat:
+    path: "{{ lamp_clone_path }}"
+  register: repo_status
+
+# Clone the LAMP repository if not already done
+- name: Clone the LAMP repository
+  git:
+    repo: https://github.com/EdgeKing810/interns-docker-compose-lamp.git
+    dest: "{{ lamp_clone_path }}"
+    version: master # Change to the correct branch if needed
+  when: not repo_status.stat.exists
+  tags: lamp
+
+# Check if .env.sample exists
+- name: Check if .env.sample exists
+  stat:
+    path: "{{ lamp_clone_path }}/.env.sample"
+  register: env_sample_status
+  tags: lamp
+
+# Rename .env.sample to .env by copying it
+- name: Copy .env.sample to .env
+  copy:
+    src: "{{ lamp_clone_path }}/.env.sample"
+    dest: "{{ lamp_clone_path }}/.env"
+  when: env_sample_status.stat.exists
+  tags: lamp
+
+# delete .env.sample
+- name: Delete .env.sample
+  ansible.builtin.file:
+    path: "{{ lamp_clone_path }}/.env.sample"
+    state: absent
+  when: env_sample_status.stat.exists
+  tags: lamp
+
+# Generate secure passwords
+- name: Generate secure passwords
+  set_fact:
+    db_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits') }}"
+    db_root_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits') }}"
+
+# Add environment variables to the .env file
+- name: Add environment variables to .env
+  lineinfile:
+    path: "{{ lamp_clone_path }}/.env"
+    line: "{{ item.key }}={{ item.value }}"
+    create: yes
+  loop: "{{ env_variables | dict2items }}"
+  vars:
+    env_variables:
+      DB_NAME: ansible_db
+      DB_USERNAME: ansible_user
+      DB_PASSWORD: "{{ db_password }}"
+      DB_ROOT_PASSWORD: "{{ db_root_password }}"
+  
+  tags: lamp
+  when: not repo_status.stat.exists
+
+# Modify index.php to update DB username and password
+- name: Update index.php with new DB credentials
+  replace:
+    path: "{{ lamp_clone_path }}/webroot/index.php"
+    regexp: '\$link = mysqli_connect\("mysql", "root", "tiger", null\);'
+    replace: '$link = mysqli_connect("mysql", "ansible_user", "{{ db_password }}", "ansible_db");'
+  tags: lamp
+
+# Copy Dockerfile and docker-compose.yml from templates or predefined source
+- name: Copy Dockerfile
+  copy:
+    src: roles/configure_lamp/files/DockerFile
+    dest: "{{ lamp_clone_path }}/bin/webserver/Dockerfile"
+  tags: lamp
+
+- name: Create docker-compose.yml
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: "{{ lamp_clone_path }}/docker-compose.yml"
+  tags: lamp
+
+# Check if any LAMP-related containers are running
+- name: Check if any LAMP-related containers are running
+  shell: docker ps -q -f name=interns- # Assuming all containers start with 'interns-'
+  register: running_containers
+  changed_when: false
+
+# Stop and remove running containers if any
+- name: Stop and remove running LAMP containers
+  shell: docker-compose down
+  args:
+    chdir: "{{ lamp_clone_path }}"
+  when: running_containers.stdout != ""
+  tags: lamp
+
+# Run docker-compose up to start the containers
+- name: Run docker-compose up
+  command: docker-compose up -d # Run in detached mode
+  args:
+    chdir: "{{ lamp_clone_path }}"
+  register: result
+  retries: 3 # Retry on failure
+  delay: 10 # Delay between retries
+  until: result.rc == 0
+  tags: lamp
+  ignore_errors: yes

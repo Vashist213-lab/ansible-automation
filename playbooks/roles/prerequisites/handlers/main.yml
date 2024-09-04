@@ -1,0 +1,7 @@
+---
+- name: Enable and start Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+  tags: nginx

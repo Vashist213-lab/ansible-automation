@@ -1,0 +1,19 @@
+---
+# Handler to test Nginx configuration
+- name: Test Nginx Configuration
+  command: nginx -t
+  register: nginx_test
+  ignore_errors: yes
+
+# Handler to restart Nginx if configuration is valid
+- name: Restart Nginx
+  service:
+    name: nginx
+    state: restarted
+  when: nginx_test.rc == 0
+
+# Handler to restart Docker service
+- name: Restart Docker
+  service:
+    name: docker
+    state: restarted

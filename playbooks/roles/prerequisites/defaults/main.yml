@@ -1,0 +1,13 @@
+---
+# Define package names and versions with the role prefix
+prerequisites_default_packages:
+  - curl
+  - git
+  - unzip
+
+prerequisites_python_packages:
+  - python3
+  - python3-venv
+  - python3-virtualenv
+
+prerequisites_nginx_package: nginx

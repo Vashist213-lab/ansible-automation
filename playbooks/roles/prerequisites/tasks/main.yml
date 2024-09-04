@@ -3,7 +3,40 @@
 # Add tasks to install packages such as python3 and nginx here
 # Use a defaults/main.yml file to define package names and/or versions if necessary
 # Use a handlers/main.yml file to enable and start nginx
+# Task 1: Update and Upgrade the System
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  tags: prerequisites
 
-- name: Print message
-  ansible.builtin.debug:
-    msg: Please remove me
+- name: Upgrade the system packages
+  ansible.builtin.apt:
+    upgrade: dist
+    autoremove: true
+  tags: prerequisites
+
+# Install essential packages
+- name: Install default packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ prerequisites_default_packages }}"
+  tags: prerequisites
+
+# Install Python3 and virtual environment packages
+- name: Install Python3 and virtualenv packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ prerequisites_python_packages }}"
+  tags: python
+
+# Install Nginx
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: "{{ prerequisites_nginx_package }}"
+    state: present
+  notify: 
+    - Enable and start Nginx
+  tags: nginx
+
