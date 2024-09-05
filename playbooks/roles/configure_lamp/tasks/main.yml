@@ -1,23 +1,6 @@
 ---
 # Playbook to configure a LAMP stack with Docker using Ansible
 # Add tasks to automate steps as per the requirements
-
-# Ensure Docker is installed
-- name: Install Docker
-  apt:
-    name: docker.io
-    state: present
-    update_cache: yes
-  become: true
-
-# Ensure Docker Compose is installed
-- name: Install Docker Compose
-  apt:
-    name: docker-compose
-    state: present
-    update_cache: yes
-  become: true
-
 # Define the path for cloning the LAMP repository
 - name: Define LAMP clone path
   set_fact:
@@ -80,7 +63,7 @@
       DB_USERNAME: ansible_user
       DB_PASSWORD: "{{ db_password }}"
       DB_ROOT_PASSWORD: "{{ db_root_password }}"
-  
+
   tags: lamp
   when: not repo_status.stat.exists
 

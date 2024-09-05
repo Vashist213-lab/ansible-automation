@@ -3,4 +3,4 @@ nginx_path: "{{ lamp_clone_path }}/nginx"
 ssl_cert_file: "{{ nginx_path }}/nginx-certificate.crt"
 ssl_key_file: "{{ nginx_path }}/nginx-pk.key"
 nginx_vhost_path: "{{ nginx_path }}/default.conf"
-nginx_vhost_link: "/etc/nginx/sites-enabled/default.conf"  # Link configuration to sites-enabled
+nginx_vhost_link: "/etc/nginx/sites-enabled/default.conf" 
