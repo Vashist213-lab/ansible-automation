@@ -19,11 +19,11 @@
 - name: Generate SSL certificate
   openssl_certificate:
     path: "{{ ssl_cert_file }}"
-    privatekey_path: "{{ ssl_key_file }}"git config --global user.email "your-email@example.com"
+    privatekey_path: "{{ ssl_key_file }}"
 
     provider: selfsigned
-    selfsigned_not_before: "{{ lookup('pipe', 'date -u +%Y%m%d%H%M%SZ') }}"  # Current UTC time
-    selfsigned_not_after: "{{ lookup('pipe', 'date -u -d +365days +%Y%m%d%H%M%SZ') }}"  # Expires in 365 days
+    selfsigned_not_before: "{{ lookup('pipe', 'date -u +%Y%m%d%H%M%SZ') }}" # Current UTC time
+    selfsigned_not_after: "{{ lookup('pipe', 'date -u -d +365days +%Y%m%d%H%M%SZ') }}" # Expires in 365 days
     subject:
       commonName: "localhost"
       countryName: "US"
@@ -46,4 +46,4 @@
     src: "{{ nginx_vhost_path }}"
     dest: "{{ nginx_vhost_link }}"
     state: link
-  notify: Restart Nginx 
+  notify: Restart Nginx
